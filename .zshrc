@@ -35,7 +35,9 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 alias ls="ls --color"
 alias neofetch="neofetch | lolcat"
 alias update="sudo pacman -Syu"
+alias battery="cat /sys/class/power_supply/BAT0/capacity"
 
 eval "$(fzf --zsh)"
 eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/conf.toml)"
 eval "$(zoxide init --cmd cd zsh)"
+[ -s "/home/groobi/.jabba/jabba.sh" ] && source "/home/groobi/.jabba/jabba.sh"

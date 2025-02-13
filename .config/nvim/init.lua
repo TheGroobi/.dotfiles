@@ -12,3 +12,5 @@ require("catppuccin").setup({
 })
 vim.cmd.colorscheme "catppuccin"
 vim.opt.wildignore:append({ "node_modeles/*, .git/*" })
+vim.cmd.colorscheme "catppuccin"
+vim.opt.wildignore:append({ "node_modeles/*, .git/*" })
