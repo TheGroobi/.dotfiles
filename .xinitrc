@@ -42,6 +42,13 @@ xterm -geometry 80x50+494+51 &
 xterm -geometry 80x20+494-0 &
 exec xterm -geometry 80x66+0+0 -name login &
 
-exec startxfce4
+startxfce4 & 
+while ! xprop -root _NET_DESKTOP_NAMES &> /dev/null; do
+    sleep 1
+done
 
-exec polybar
+$HOME/.config/polybar/launch.sh
+
+killall xfce4-panel
+
+wait
