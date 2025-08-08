@@ -1,0 +1,12 @@
+{
+	"svelte.enable-ts-plugin": true,
+	"prettier.requireConfig": false,
+	"prettier.enable": true,
+	"prettier.tabWidth": 2,
+	"prettier.useTabs": false,
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": true,
+		"source.organizeImports": true,
+	},
+	"coc.preferences.formatOnSave": true,
+}
