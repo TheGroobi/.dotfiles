@@ -8,6 +8,7 @@ vim.opt.fileencoding = "utf-8"
 
 vim.opt.number = true
 
+vim.opt.clipboard = "unnamedplus"
 vim.opt.title = true
 vim.opt.autoindent = true
 vim.opt.smartindent = true
@@ -34,7 +35,7 @@ vim.opt.splitkeep = "cursor"
 vim.opt.formatoptions:append({ "r" })
 
 vim.g.lazyvim_php_lsp = "intelephense"
-vim.g.netrw_list_hide = '\\(^\\|/\\)\\(node_modules/\\|\\.git/\\|bin/\\|dist/\\)'
+vim.g.netrw_list_hide = "\\(^\\|/\\)\\(node_modules/\\|\\.git/\\|bin/\\|dist/\\)"
 vim.g.netrw_hide = 1
 
 vim.g.lazyvim_picker = "telescope"

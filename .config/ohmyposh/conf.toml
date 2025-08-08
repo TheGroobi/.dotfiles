@@ -1,53 +1,54 @@
-#:schema https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json
-
-version = 2
-final_space = true
 console_title_template = '{{ .Shell }} in {{ .Folder }}'
+version = 3
+final_space = true
+
+[palette]
+  purple = '#9333ea'
 
 [[blocks]]
   type = 'rprompt'
   overflow = 'hidden'
 
   [[blocks.segments]]
-    type = 'executiontime'
-    style = 'plain'
+    template = '{{ .FormattedMs }}'
     foreground = 'magenta'
     background = 'transparent'
-    template = '{{ .FormattedMs }}'
+    type = 'executiontime'
+    style = 'plain'
+
+    [blocks.segments.properties]
+      cache_duration = 'none'
 
 [[blocks]]
   type = 'prompt'
   alignment = 'left'
 
   [[blocks.segments]]
+    foreground = 'p:purple'
     type = 'path'
     style = 'plain'
-    backgound = 'transparent'
-    foreground = 'p:purple'
 
     [blocks.segments.properties]
-    style = 'full'
+      cache_duration = 'none'
+      style = 'full'
 
   [[blocks.segments]]
-    type = 'git'
-    style = 'plain'
+    template = '{{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed)}}*{{end}}'
     foreground = '#6c6c6c'
     background = 'transparent'
-    template = '{{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed)}}*{{end}}'
+    type = 'git'
+    style = 'plain'
 
     [blocks.segments.properties]
+      cache_duration = 'none'
       fetch_status = true
 
   [[blocks.segments]]
+    template = '󰞷'
+    background = 'transparent'
     type = 'text'
     style = 'plain'
-    foreground_templates = [
-      "{{if gt .Code 0}}red{{end}}",
-      "{{if eq .Code 0}}p:purple{{end}}",
-    ]
-    background = 'transparent'
-    template = "󰞷"
+    foreground_templates = ['{{if gt .Code 0}}red{{end}}', '{{if eq .Code 0}}p:purple{{end}}']
 
-[palette]
-purple = '#9333ea'
-
+    [blocks.segments.properties]
+      cache_duration = 'none'

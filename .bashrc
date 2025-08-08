@@ -9,3 +9,4 @@ alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 PS1='[\u@\h \W]\$ '
 . "$HOME/.cargo/env"
+[ -s "/home/groobi/.jabba/jabba.sh" ] && source "/home/groobi/.jabba/jabba.sh"
