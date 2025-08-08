@@ -36,3 +36,5 @@ vim.opt.formatoptions:append({ "r" })
 vim.g.lazyvim_php_lsp = "intelephense"
 vim.g.netrw_list_hide = '\\(^\\|/\\)\\(node_modules/\\|\\.git/\\|bin/\\|dist/\\)'
 vim.g.netrw_hide = 1
+
+vim.g.lazyvim_picker = "telescope"
