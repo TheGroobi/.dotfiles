@@ -29,7 +29,7 @@ vim.opt.hlsearch = true
 vim.opt.backup = false
 vim.opt.showcmd = true
 vim.opt.cmdheight = 0
-vim.opt.laststatus = 0
+vim.opt.laststatus = 3
 vim.opt.scrolloff = 10
 vim.opt.expandtab = true
 vim.opt.inccommand = "split"
@@ -44,7 +44,6 @@ vim.opt.path:append({ "**" })
 vim.opt.wildignore:append({ "node_modeles/*, .git/*" })
 vim.opt.splitkeep = "cursor"
 vim.opt.formatoptions:append({ "r" })
-vim.g.gitsigns_use_system = true
 
 -- We use neo-tree instead of netrw
 vim.g.netrw_hide = 1
@@ -75,6 +74,7 @@ vim.keymap.set("n", "K", "<Cmd>call CocActionAsync('doHover')<CR>", { silent = t
 -- NeoTree toggle
 vim.keymap.set("n", "<leader>h", "<cmd>Neotree toggle<cr>", { desc = "Toggle Neo-tree" })
 
+---@diagnostic disable-next-line: duplicate-set-field
 _G.check_back_space = function()
     local col = vim.fn.col('.') - 1
     if col == 0 then return true end
@@ -167,7 +167,21 @@ require('lazy').setup({
         },
     },
     {
-        'lewis6991/gitsigns.nvim',
+        'airblade/vim-gitgutter',
+        event = { 'BufReadPre', 'BufNewFile' },
+        init = function()
+            vim.g.gitgutter_sign_added    = '▌'
+            vim.g.gitgutter_sign_modified = '▌'
+            vim.g.gitgutter_sign_removed        = '_'
+            vim.g.gitgutter_sign_removed_first_line = '‾'
+            vim.g.gitgutter_sign_modified_removed = '~'
+
+            vim.g.gitgutter_realtime = 1
+            vim.g.gitgutter_eager    = 1
+        end,
+    },
+    {
+        'rhysd/conflict-marker.vim',
     },
     {
         "smjonas/inc-rename.nvim",
@@ -301,15 +315,31 @@ require('lazy').setup({
         priority = 1000,
         config = function()
             require("catppuccin").setup({
-                flavour = "frappe",
-                transparent_background = true,
+                 float = {
+                     transparent = true,
+                     solid = false
+                 },
+                flavour = "mocha",
                 styles = {
                     keywords = {"bold"},
-                }
-                ,no_italic = true,
+                },
+                dim_inactive = {
+                    enabled = false,
+                    shade = "dark",
+                    percentage = 0.15,
+                },
+                no_italic = true,
                 no_bold = true,
             })
             vim.cmd.colorscheme("catppuccin")
+
+            local flavor = require("catppuccin").flavour or "frappe"
+            local colors = require("catppuccin.palettes").get_palette(flavor)
+            local sign_bg = vim.api.nvim_get_hl(0, { name = 'SignColumn' }).bg or colors.base
+
+            vim.api.nvim_set_hl(0, 'GitGutterAdd',    { fg = colors.green,  bg = sign_bg })
+            vim.api.nvim_set_hl(0, 'GitGutterChange', { fg = colors.yellow, bg = sign_bg })
+            vim.api.nvim_set_hl(0, 'GitGutterDelete', { fg = colors.red,    bg = sign_bg })
         end,
     },
     -- Highlight todo, notes, etc in comments
@@ -350,12 +380,62 @@ require('lazy').setup({
         config = function()
             require('mini.ai').setup { n_lines = 500 }
             require('mini.surround').setup()
-            local statusline = require 'mini.statusline'
-            statusline.setup { use_icons = vim.g.have_nerd_font }
-            ---@diagnostic disable-next-line: duplicate-set-field
-            statusline.section_location = function()
-                return '%2l:%-2v'
+
+            local statusline = require('mini.statusline')
+            statusline.setup({
+                use_icons = vim.g.have_nerd_font,
+                set_vim_settings = true,
+            })
+
+            statusline.section_fileinfo = function()
+                local path = vim.fn.expand('%:p:h') -- get dir of current file
+                local parts = vim.split(path, '[\\/]', { plain = false })
+                return table.concat(vim.list_slice(parts, math.max(#parts - 2, 1)), '/') .. ' '
             end
+
+            local function filename_with_icon()
+                local fname = vim.fn.expand('%:t')
+                if fname == '' then fname = '[No Name]' end
+                local icon = ''
+                local ok, devicons = pcall(require, 'nvim-web-devicons')
+                if ok then
+                    local ic = devicons.get_icon(fname, nil, { default = true })
+                    if ic then icon = ic .. ' ' end
+                end
+                local modified = vim.bo.modified and ' +' or ''
+                return icon .. fname .. modified
+            end
+
+            local function clock()
+                return os.date(' %H:%M ')
+            end
+
+            statusline.active = function()
+                local mode   = statusline.section_mode({ trunc_width = 120 })
+                local git    = statusline.section_git({ trunc_width = 75 })
+                local diags  = statusline.section_diagnostics({ trunc_width = 75 })
+                return statusline.combine_groups({
+                    { hl = 'MiniStatuslineModeNormal', strings = { mode } },
+                    { hl = 'MiniStatuslineDevinfo',    strings = { git, diags } },
+                    '%<', -- allow left side to truncate
+                    { hl = 'MiniStatuslineFilename',   strings = { filename_with_icon() } },
+                    '%=', -- right align from here
+                    { hl = 'MiniStatuslineModeNormal', strings = { clock() } },
+                })
+            end
+            local flavor = require("catppuccin").flavour or "frappe"
+            local colors = require("catppuccin.palettes").get_palette(flavor)
+
+            vim.api.nvim_set_hl(0, 'MiniStatuslineModeNormal', { fg = colors.base, bg = colors.blue, bold = true })
+            vim.api.nvim_set_hl(0, 'MiniStatuslineModeInsert', { fg = colors.base, bg = colors.green, bold = true })
+            vim.api.nvim_set_hl(0, 'MiniStatuslineModeVisual', { fg = colors.base, bg = colors.mauve, bold = true })
+            vim.api.nvim_set_hl(0, 'MiniStatuslineModeReplace', { fg = colors.base, bg = colors.red, bold = true })
+            vim.api.nvim_set_hl(0, 'MiniStatuslineModeCommand', { fg = colors.base, bg = colors.peach, bold = true })
+
+            vim.api.nvim_set_hl(0, 'MiniStatuslineDevinfo', { fg = colors.text, bg = colors.surface0 })
+            vim.api.nvim_set_hl(0, 'MiniStatuslineFilename', { fg = colors.text, bg = colors.surface1 })
+            vim.api.nvim_set_hl(0, 'MiniStatuslineInactive', { fg = colors.overlay0, bg = colors.base })
+
         end,
     },
     {
